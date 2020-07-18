@@ -110,3 +110,11 @@ After you've made changes, run the above two commands again
 ### View logs
 
 From within the project, run `docker-compose logs -f app`
+
+### Run tests
+
+For the time being there are no separate unit and functional tests. To run
+_the tests_ issue the command:
+```
+docker-compose run test
+```

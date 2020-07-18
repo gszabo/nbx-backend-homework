@@ -3,6 +3,9 @@ FROM python:3.7
 COPY requirements.txt /
 RUN pip install -r requirements.txt
 
-COPY ./userservice /app
+COPY ./userservice /work/userservice
+COPY ./tests /work/tests
 
-ENTRYPOINT ["python", "app"]
+WORKDIR /work
+
+ENTRYPOINT ["python", "userservice"]

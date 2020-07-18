@@ -7,3 +7,15 @@ services:
       - "8080:8080"
     healthcheck:
       test: ["CMD", "curl", "-f", "localhost:8080"]
+
+  test:
+    build: ./
+    volumes:
+      - ./userservice:/work/userservice
+      - ./tests:/work/tests
+    entrypoint:
+      - /bin/bash
+      - -c
+    command:
+      - pytest
+      - -v
