@@ -45,6 +45,10 @@ async def update_user(request):
 
 @routes.delete('/users/{user_id}')
 async def delete_user(request):
+    id_ = request.match_info["user_id"]
+    if id_ not in users:
+        raise web.HTTPNotFound()
+    del users[id_]
     return web.json_response(None, status=204)
 
 
