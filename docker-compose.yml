@@ -17,5 +17,4 @@ services:
       - /bin/bash
       - -c
     command:
-      - pytest
-      - -v
+      - pytest -v

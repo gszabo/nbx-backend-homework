@@ -65,6 +65,13 @@ async def delete_user(request):
     return web.json_response(None, status=204)
 
 
+@routes.delete("/users")
+async def delete_users(request):
+    global users
+    users = {}
+    return web.json_response(None, status=204)
+
+
 def create_app():
     app = web.Application()
     app.add_routes(routes)
