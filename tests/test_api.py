@@ -56,6 +56,8 @@ class TestCreateUser:
         input_data = {"name": "User_A", "email": "email_a@example.com"}
 
         create_response = await client.post("/users", json=input_data)
+        assert create_response.status == 201
+
         response_data = await create_response.json()
 
         assert response_data["name"] == input_data["name"]
