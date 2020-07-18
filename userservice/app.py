@@ -40,7 +40,18 @@ async def create_user(request):
 
 @routes.put('/users/{user_id}')
 async def update_user(request):
-    return web.json_response({})
+    id_ = request.match_info["user_id"]
+    if id_ not in users:
+        raise web.HTTPNotFound()
+
+    user = users[id_]
+    body = await request.json()
+    if "name" in body:
+        user["name"] = body["name"]
+    if "email" in body:
+        user["email"] = body["email"]
+
+    return web.json_response(user)
 
 
 @routes.delete('/users/{user_id}')
