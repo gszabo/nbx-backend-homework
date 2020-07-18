@@ -21,12 +21,19 @@ async def health(request):
 async def get_users(request):
     return web.json_response(list(users.values()))
 
+@routes.get('/users/{user_id}')
+async def get_user(request):
+    id_ = request.match_info["user_id"]
+    if id_ in users:
+        return web.json_response(users[id_])
+    else:
+        raise web.HTTPNotFound()
 
 @routes.post('/users')
 async def create_user(request):
     body = await request.json()
-    id_ = uuid.uuid4()
-    new_user = {"name": body["name"], "id": str(id_), "email": body["email"]}
+    id_ = str(uuid.uuid4())
+    new_user = {"name": body["name"], "id": id_, "email": body["email"]}
     users[id_] = new_user
     return web.json_response(new_user, status=201)
 
