@@ -1,7 +1,7 @@
 import logging
-from aiohttp import web
 import uuid
 
+from aiohttp import web
 
 LOGGER = logging.getLogger(__name__)
 
@@ -12,16 +12,17 @@ routes = web.RouteTableDef()
 users = {}
 
 
-@routes.get('/')
+@routes.get("/")
 async def health(request):
-    return web.json_response({'name': 'user-service'})
+    return web.json_response({"name": "user-service"})
 
 
-@routes.get('/users')
+@routes.get("/users")
 async def get_users(request):
     return web.json_response(list(users.values()))
 
-@routes.get('/users/{user_id}')
+
+@routes.get("/users/{user_id}")
 async def get_user(request):
     id_ = request.match_info["user_id"]
     if id_ in users:
@@ -29,7 +30,8 @@ async def get_user(request):
     else:
         raise web.HTTPNotFound()
 
-@routes.post('/users')
+
+@routes.post("/users")
 async def create_user(request):
     body = await request.json()
     id_ = str(uuid.uuid4())
@@ -38,7 +40,7 @@ async def create_user(request):
     return web.json_response(new_user, status=201)
 
 
-@routes.put('/users/{user_id}')
+@routes.put("/users/{user_id}")
 async def update_user(request):
     id_ = request.match_info["user_id"]
     if id_ not in users:
@@ -54,7 +56,7 @@ async def update_user(request):
     return web.json_response(user)
 
 
-@routes.delete('/users/{user_id}')
+@routes.delete("/users/{user_id}")
 async def delete_user(request):
     id_ = request.match_info["user_id"]
     if id_ not in users:
