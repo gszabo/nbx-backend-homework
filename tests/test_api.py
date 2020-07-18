@@ -145,3 +145,25 @@ class TestUpdateUser:
 
         other_id_response = await client.get("/users/id42")
         assert other_id_response.status == 404
+
+
+class TestDeleteUser:
+    async def test_user_not_found_responds_with_404(self, client):
+        resp = await client.delete("/users/nouser", json={})
+
+        assert resp.status == 404
+
+    async def test_user_exists_deletes_and_responds_with_204(self, client):
+        create_response = await client.post(
+            "/users", json={"name": "User_A", "email": "email_a@example.com"}
+        )
+        user_data = await create_response.json()
+
+        resp = await client.delete("/users/" + user_data["id"])
+
+        assert resp.status == 204
+
+        all_users_response = await client.get("/users")
+        all_users = await all_users_response.json()
+
+        assert all_users == []
