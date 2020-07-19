@@ -13,3 +13,4 @@ Things I would like to add:
     - input validation:
         - email addresses are well formatted
         - names have a minimum length
+- test create user only uses email and name
