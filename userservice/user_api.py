@@ -1,6 +1,7 @@
 import uuid
-
 from dataclasses import dataclass
+
+from marshmallow import Schema, fields
 
 
 @dataclass
@@ -8,6 +9,12 @@ class User:
     id: str
     name: str
     email: str
+
+
+class UserSchema(Schema):
+    id = fields.UUID()
+    name = fields.String()
+    email = fields.Email()
 
 
 class UserAPI:

@@ -1,10 +1,8 @@
 import logging
-from dataclasses import asdict
 
 from aiohttp import web
 
-from userservice.user_api import UserAPI
-
+from userservice.user_api import UserAPI, UserSchema
 
 routes = web.RouteTableDef()
 
@@ -17,14 +15,14 @@ async def health(request: web.Request):
 @routes.get("/users")
 async def get_users(request: web.Request):
     users = _get_api(request).get_users()
-    return web.json_response([asdict(user) for user in users])
+    return web.json_response(UserSchema().dump(users, many=True))
 
 
 @routes.get("/users/{user_id}")
 async def get_user(request: web.Request):
     user = _get_api(request).get_user(request.match_info["user_id"])
     if user:
-        return web.json_response(asdict(user))
+        return web.json_response(UserSchema().dump(user))
     else:
         raise web.HTTPNotFound()
 
@@ -32,7 +30,7 @@ async def get_user(request: web.Request):
 @routes.post("/users")
 async def create_user(request: web.Request):
     new_user = _get_api(request).create_user(await request.json())
-    return web.json_response(asdict(new_user), status=201)
+    return web.json_response(UserSchema().dump(new_user), status=201)
 
 
 @routes.put("/users/{user_id}")
@@ -45,7 +43,7 @@ async def update_user(request: web.Request):
     if not updated_user:
         raise web.HTTPNotFound()
 
-    return web.json_response(asdict(updated_user))
+    return web.json_response(UserSchema().dump(updated_user))
 
 
 @routes.delete("/users/{user_id}")
