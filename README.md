@@ -97,7 +97,7 @@ From within the project, run `docker-compose build`
 
 ### Run
 
-From within the project, run `docker-compose up -d`
+From within the project, run `docker-compose up -d app`
 
 ### Verify the service is up and running
 
@@ -111,6 +111,35 @@ After you've made changes, run the above two commands again
 
 From within the project, run `docker-compose logs -f app`
 
+## Solution comments
+
+### Scope
+
+Apart from the required functionality, I added from the extras:
+- tests (HTTP endpoint based tests, so they are more or less functional tests)
+- input validation
+- separated user management logic from web request handlers
+
+### Approach
+
+The git history should give an idea about how I approached the problem. I went through
+roughly these steps:
+
+1. First, I implemented the functionality inside the request handlers with a global dictionary
+object. At this stage I tested the endpoints manually, with `curl`.
+2. Then I set up the infrastructure to run tests. I created some HTTP endpoint
+based tests to cover me during refactoring. To isolate the tests, I added a
+new endpoint that let me clear the "user database" for each test.
+3. With the tests acting as a safety net, I extracted the user management logic
+into its own module. Then I replaced the global variable with an instance of the
+API class injected into the `app` instance. This allowed me to inject a new,
+fresh instance into every test, so I deleted the "clear database" endpoint created
+earlier for the tests.
+4. After that I introduced a dataclass holding the user information and changed
+the API internally to store that kind of objects.
+5. Lastly, I created schema descriptor classes to serialize User objects and
+deserialize and validate input data (for user creation and update).
+
 ### Run tests
 
 For the time being there are no separate unit and functional tests. To run
@@ -118,3 +147,5 @@ _the tests_ issue the command:
 ```
 docker-compose run test
 ```
+
+The tests are run in a randomized order.
