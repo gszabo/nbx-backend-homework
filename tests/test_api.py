@@ -63,6 +63,14 @@ class TestCreateUser:
         assert response_data["name"] == input_data["name"]
         assert response_data["email"] == input_data["email"]
 
+    async def test_only_uses_email_and_name_from_input(self, client):
+        input_data = {"name": "User_A", "email": "email_a@example.com", "age": 42}
+
+        create_response = await client.post("/users", json=input_data)
+        response_data = await create_response.json()
+
+        assert "age" not in response_data
+
 
 class TestGetUser:
     async def test_user_not_found_responds_with_404(self, client):
