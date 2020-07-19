@@ -41,9 +41,13 @@ async def create_user(request: web.Request):
 @routes.put("/users/{user_id}")
 async def update_user(request: web.Request):
     id_ = request.match_info["user_id"]
-    body = await request.json()
 
-    updated_user = _get_api(request).update_user(id_, body)
+    try:
+        update_params = UserCreationSchema().load(await request.json(), partial=True)
+    except ValidationError as err:
+        raise web.HTTPBadRequest(reason=err)
+
+    updated_user = _get_api(request).update_user(id_, update_params)
 
     if not updated_user:
         raise web.HTTPNotFound()

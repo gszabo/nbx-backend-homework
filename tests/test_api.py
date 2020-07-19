@@ -162,22 +162,26 @@ class TestUpdateUser:
         assert updated_user_data["name"] == "User_A"
         assert updated_user_data["email"] == "email_a2@example.com"
 
-    async def test_id_and_other_fields_are_ignored(self, client):
+    @pytest.mark.parametrize(
+        "input_data",
+        [{"email": "email"}, {"name": ""}, {"name": None}, {"id": "id42"}, {"age": 42}],
+        ids=["invalid email", "empty name", "null name", "ID field", "unknown field"],
+    )
+    async def test_invalid_input_responds_with_400(self, client, input_data):
         create_response = await client.post(
             "/users", json={"name": "User_A", "email": "email_a@example.com"}
         )
-        original_user_data = await create_response.json()
+        user_data = await create_response.json()
 
-        update_user_response = await client.put(
-            "/users/" + original_user_data["id"], json={"id": "id42", "age": 42}
-        )
-        assert update_user_response.status == 200
-        updated_user_data = await update_user_response.json()
+        update_response = await client.put("/users/" + user_data["id"], json=input_data)
 
-        assert updated_user_data == original_user_data
+        assert update_response.status == 400
 
-        other_id_response = await client.get("/users/id42")
-        assert other_id_response.status == 404
+        # check that user is not modified at all
+        original_user_response = await client.get("/users/" + user_data["id"])
+        original_user_data = await original_user_response.json()
+
+        assert original_user_data == user_data
 
 
 class TestDeleteUser:
