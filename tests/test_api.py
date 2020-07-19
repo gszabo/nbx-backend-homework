@@ -1,19 +1,20 @@
 from operator import itemgetter
 
-from userservice.app import create_app
-
 import pytest
+
+from userservice.app import create_app
+from userservice.user_api import UserAPI
 
 
 @pytest.fixture
 def client(loop, aiohttp_client):
     app = create_app()
+
+    # this dependency injection here ensures every test starts
+    # with a clean "user database"
+    app["userservice.api"] = UserAPI()
+
     return loop.run_until_complete(aiohttp_client(app))
-
-
-@pytest.fixture(autouse=True)
-async def delete_users(client):
-    await client.delete("/users")
 
 
 async def test_healthcheck(client):

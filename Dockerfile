@@ -8,4 +8,4 @@ COPY ./tests /work/tests
 
 WORKDIR /work
 
-ENTRYPOINT ["python", "userservice"]
+ENTRYPOINT ["python", "-m", "userservice"]
