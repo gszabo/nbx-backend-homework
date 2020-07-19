@@ -1,8 +1,9 @@
 import logging
 
 from aiohttp import web
+from marshmallow import ValidationError
 
-from userservice.user_api import UserAPI, UserSchema
+from userservice.user_api import UserAPI, UserCreationSchema, UserSchema
 
 routes = web.RouteTableDef()
 
@@ -29,8 +30,12 @@ async def get_user(request: web.Request):
 
 @routes.post("/users")
 async def create_user(request: web.Request):
-    new_user = _get_api(request).create_user(await request.json())
-    return web.json_response(UserSchema().dump(new_user), status=201)
+    try:
+        params = UserCreationSchema().load(await request.json())
+        new_user = _get_api(request).create_user(params)
+        return web.json_response(UserSchema().dump(new_user), status=201)
+    except ValidationError as err:
+        raise web.HTTPBadRequest(reason=err)
 
 
 @routes.put("/users/{user_id}")

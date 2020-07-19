@@ -64,13 +64,37 @@ class TestCreateUser:
         assert response_data["name"] == input_data["name"]
         assert response_data["email"] == input_data["email"]
 
-    async def test_only_uses_email_and_name_from_input(self, client):
+    async def test_unknown_field_in_input_responds_with_400(self, client):
         input_data = {"name": "User_A", "email": "email_a@example.com", "age": 42}
 
         create_response = await client.post("/users", json=input_data)
-        response_data = await create_response.json()
+        response_text = await create_response.text()
 
-        assert "age" not in response_data
+        assert create_response.status == 400
+        assert "age" in response_text
+        assert "unknown" in response_text.lower()
+
+    @pytest.mark.parametrize(
+        "input_data",
+        [
+            {"name": "User_A", "email": "email"},
+            {"name": "", "email": "email@example.com"},
+            {"name": None, "email": "email@example.com"},
+            {"email": "email@example.com"},
+            {"name": "User_A"},
+        ],
+        ids=[
+            "invalid email",
+            "empty name",
+            "null name",
+            "missing name",
+            "missing email",
+        ],
+    )
+    async def test_invalid_input_responds_with_400(self, client, input_data):
+        create_response = await client.post("/users", json=input_data)
+
+        assert create_response.status == 400
 
 
 class TestGetUser:
