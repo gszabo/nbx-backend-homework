@@ -1,4 +1,5 @@
 import logging
+from dataclasses import asdict
 
 from aiohttp import web
 
@@ -15,14 +16,15 @@ async def health(request: web.Request):
 
 @routes.get("/users")
 async def get_users(request: web.Request):
-    return web.json_response(_get_api(request).get_users())
+    users = _get_api(request).get_users()
+    return web.json_response([asdict(user) for user in users])
 
 
 @routes.get("/users/{user_id}")
 async def get_user(request: web.Request):
     user = _get_api(request).get_user(request.match_info["user_id"])
     if user:
-        return web.json_response(user)
+        return web.json_response(asdict(user))
     else:
         raise web.HTTPNotFound()
 
@@ -30,7 +32,7 @@ async def get_user(request: web.Request):
 @routes.post("/users")
 async def create_user(request: web.Request):
     new_user = _get_api(request).create_user(await request.json())
-    return web.json_response(new_user, status=201)
+    return web.json_response(asdict(new_user), status=201)
 
 
 @routes.put("/users/{user_id}")
@@ -43,7 +45,7 @@ async def update_user(request: web.Request):
     if not updated_user:
         raise web.HTTPNotFound()
 
-    return web.json_response(updated_user)
+    return web.json_response(asdict(updated_user))
 
 
 @routes.delete("/users/{user_id}")
